@@ -1,3 +1,8 @@
-export default function(message, inPeace = false) {
-    console.log(`${message}! ${inPeace ? 'Yes':'No'}`);
-};
+export default function (message, inPeace = false) {
+    if (!inPeace) {
+    setTimeout(() => {
+      import("../styles/alien-greeting.css");
+    }, 4000);
+}
+  console.log(`${message}! ${inPeace ? "Yes" : "No"}`);
+}
