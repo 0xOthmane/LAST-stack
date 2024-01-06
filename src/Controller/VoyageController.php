@@ -69,8 +69,13 @@ class VoyageController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Voyage updated!');
-
-            return $this->redirectToRoute('app_voyage_index', [], Response::HTTP_SEE_OTHER);
+            if ($request->headers->has('turbo-frame')) {
+                $stream = $this->renderBlockView('voyage/edit.html.twig', 'stream_success', [
+                    'voyage' => $voyage
+                ]);
+                $this->addFlash('stream', $stream);
+            }
+            return $this->redirectToRoute('app_voyage_edit', ['id' => $voyage->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('voyage/edit.html.twig', [
@@ -83,10 +88,17 @@ class VoyageController extends AbstractController
     public function delete(Request $request, Voyage $voyage, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$voyage->getId(), $request->request->get('_token'))) {
+            $id = $voyage->getId();
             $entityManager->remove($voyage);
             $entityManager->flush();
 
             $this->addFlash('success', 'Voyage deleted!');
+            if ($request->headers->has('turbo-frame')) {
+                $stream = $this->renderBlockView('voyage/delete.html.twig', 'stream_success', [
+                    'id' => $id
+                ]);
+                $this->addFlash('stream', $stream);
+            }
         }
 
         return $this->redirectToRoute('app_voyage_index', [], Response::HTTP_SEE_OTHER);
