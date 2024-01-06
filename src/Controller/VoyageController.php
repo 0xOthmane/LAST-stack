@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\UX\Turbo\TurboBundle;
 
 #[Route('/voyage')]
 class VoyageController extends AbstractController
@@ -27,7 +26,7 @@ class VoyageController extends AbstractController
     #[Route('/new', name: 'app_voyage_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-
+        
         $voyage = new Voyage();
         $form = $this->createVoyageForm($voyage);
         $form->handleRequest($request);
@@ -38,10 +37,10 @@ class VoyageController extends AbstractController
 
             $this->addFlash('success', 'Bon voyage!');
             if ($request->headers->has('turbo-frame')) {
-                $request->setRequestFormat(TurboBundle::STREAM_FORMAT);
-                return $this->renderBlock('voyage/new.html.twig', 'stream_success', [
+                $stream = $this->renderBlockView('voyage/new.html.twig', 'stream_success', [
                     'voyage' => $voyage
                 ]);
+                $this->addFlash('stream', $stream);
             }
             return $this->redirectToRoute('app_voyage_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -88,7 +87,7 @@ class VoyageController extends AbstractController
     #[Route('/{id}', name: 'app_voyage_delete', methods: ['POST'])]
     public function delete(Request $request, Voyage $voyage, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $voyage->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$voyage->getId(), $request->request->get('_token'))) {
             $id = $voyage->getId();
             $entityManager->remove($voyage);
             $entityManager->flush();
