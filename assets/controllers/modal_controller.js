@@ -1,10 +1,10 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['dialog', 'dynamicContent']
+    static targets = ['dialog', 'dynamicContent', 'loadingContent']
 
     observer = null;
-    
+
     connect() {
         if (this.hasDynamicContentTarget) {
             // when the content changes, call this.open()
@@ -36,15 +36,22 @@ export default class extends Controller {
         this.dialogTarget.showModal()
         document.body.classList.add('overflow-hidden', 'blur-sm')
     }
+
     close() {
         if (this.hasDialogTarget) {
             this.dialogTarget.close()
         }
         document.body.classList.remove('overflow-hidden', 'blur-sm')
     }
+
     clickOutside(event) {
         if (event.target === this.dialogTarget) {
             this.dialogTarget.close()
         }
+    }
+
+    showLoading(){
+        if (this.dialogTarget.open) return
+        this.dynamicContentTarget.innerHTML = this.loadingContentTarget.innerHTML
     }
 }

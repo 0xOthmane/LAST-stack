@@ -7,6 +7,7 @@ use App\Form\VoyageType;
 use App\Repository\VoyageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,8 +26,9 @@ class VoyageController extends AbstractController
     #[Route('/new', name: 'app_voyage_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        
         $voyage = new Voyage();
-        $form = $this->createForm(VoyageType::class, $voyage);
+        $form = $this->createVoyageForm($voyage);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -55,7 +57,7 @@ class VoyageController extends AbstractController
     #[Route('/{id}/edit', name: 'app_voyage_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Voyage $voyage, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(VoyageType::class, $voyage);
+        $form = $this->createVoyageForm($voyage);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -83,5 +85,13 @@ class VoyageController extends AbstractController
         }
 
         return $this->redirectToRoute('app_voyage_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function createVoyageForm(Voyage $voyage = null): FormInterface
+    {
+        $voyage = $voyage ?? new Voyage();
+        return $this->createForm(VoyageType::class, $voyage, [
+            'action' => $voyage->getId() ? $this->generateUrl('app_voyage_edit', ['id' => $voyage->getId()]) : $this->generateUrl('app_voyage_new'),
+        ]);
     }
 }
