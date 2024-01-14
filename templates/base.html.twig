@@ -3,7 +3,9 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="view-transition">
+		{% if app.environment != 'test' %}
+            <meta name="view-transition">
+        {% endif %}
 		<title>
 			{% block title %}Space Inviters!
 			{% endblock %}
